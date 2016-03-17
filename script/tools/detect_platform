@@ -1,0 +1,11 @@
+#!/bin/bash -ex
+
+if type "apt-get" > /dev/null; then
+    echo "Debian"
+elif "$(uname -s)" = "Darwin"; then
+    if type "brew" > /dev/null; then
+        echo "OSX_BREW"
+    else
+        echo "OSX"
+    fi
+fi

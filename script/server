@@ -1,0 +1,12 @@
+#!/bin/sh
+# Start the web server
+# May need customizations for channels
+
+# Exit imediately on any error
+set -e
+
+# Set root dir active
+cd "$(dirname "$0")/.."
+
+# Run the server
+python manage.py runserver_plus $@
