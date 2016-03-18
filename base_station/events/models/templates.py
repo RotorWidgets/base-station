@@ -19,15 +19,6 @@ class EventTemplate(UUIDModel, TitleSlugDescriptionModel, TimeStampedModel):
         return self.title
 
 
-# Should models that are related to event design be included in the models here?
+# Should models that are related to event design be included in the models here? probably
 
-# Timer model to hold different designated times to trigger an esettings
-
-class Event(UUIDModel, TitleSlugDescriptionModel, TimeStampedModel):
-
-    template = models.ForeignKey(EventTemplate)
-
-    history = HistoricalRecords()
-
-    def __str__(self):
-        return self.title
+# TODO: Timer model to hold different designated times to trigger events

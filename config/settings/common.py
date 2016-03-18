@@ -27,21 +27,13 @@ DJANGO_APPS = (
     'django.contrib.sites',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.gis',
 
     # Useful template tags:
     # 'django.contrib.humanize',
 
     # Admin
     'django.contrib.admin',
-
-    # communication layer
-    'channels',
-
-    # base station apps
-    'base_station.wireless',
-
-    # 3rd party
-    'django_extensions',
 )
 
 THIRD_PARTY_APPS = (
@@ -49,7 +41,12 @@ THIRD_PARTY_APPS = (
     'allauth',  # registration
     'allauth.account',  # registration
     'allauth.socialaccount',  # registration
-    'simple_history',
+    'simple_history',  # model tracking
+    'channels',  # communication layer
+    'django_extensions',  # extra django things
+    'rest_framework',  # RESTful API things/framework
+    'rest_framework_gis',  # GIS support for rest_framework
+    'recurrence',  # helpers for handling recurring dates
 )
 
 # Apps specific for this project go here.
@@ -58,6 +55,8 @@ LOCAL_APPS = (
     'base_station.trackers',  # interaction with tracker hardware
     'base_station.events',  # race customization and configuration
     'base_station.races',  # state data and handling of an ongoing/past race.
+    'base_station.wireless',  # channels communication layer for wireless module
+    'base_station.api',  # RESTful api
 )
 
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#installed-apps
@@ -113,7 +112,7 @@ MANAGERS = ADMINS
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#databases
 DATABASES = {
     # Raises ImproperlyConfigured exception if DATABASE_URL not in os.environ
-    'default': env.db("DATABASE_URL", default="postgres:///base_station"),
+    'default': env.db("DATABASE_URL", default="postgis:///base_station"),
 }
 DATABASES['default']['ATOMIC_REQUESTS'] = True
 
