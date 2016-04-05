@@ -7,6 +7,11 @@ from django.conf.urls.static import static
 from django.contrib import admin
 from django.views.generic import TemplateView
 from django.views import defaults as default_views
+from django.views.decorators.csrf import csrf_exempt
+
+from base_station.races.schema import schema
+from graphene.contrib.django.views import GraphQLView
+
 
 urlpatterns = [
     url(r'^$', TemplateView.as_view(template_name='pages/home.html'), name="home"),
@@ -21,6 +26,10 @@ urlpatterns = [
 
     # API
     url(r'^api/', include("base_station.api.urls", namespace="api")),
+
+    # Graphql urls
+    url(r'^graphql', csrf_exempt(GraphQLView.as_view(schema=schema))),
+    url(r'^graphiql', include('django_graphiql.urls')),
 
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 

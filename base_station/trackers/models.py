@@ -2,16 +2,17 @@ from catalog import Catalog
 from django.db import models
 from django_extensions.db.models import TimeStampedModel
 
-from base_station.utils.models import UUIDModel
+from base_station.utils.models import SyncModel
 
 
 class TRACKER_TYPES(Catalog):
     _attrs = ('value', 'label', 'serializer_label')
     unknown = (0, 'Unkown', 'unknown')
-    ilap = (1, 'iLap', 'ilap')
+    rw_transponder = (1, 'Rotor Widgets Transponder v1', 'rw_transponder_v1')
+    ilap = (2, 'iLap', 'ilap')
 
 
-class Tracker(UUIDModel, TimeStampedModel):
+class Tracker(SyncModel, TimeStampedModel):
     """
     Represents a peices of tracker hardware that is transmitting from a vehicle.
     There can be multiple trackers with the same transmitting ID or the like.

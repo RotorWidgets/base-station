@@ -69,3 +69,10 @@ djangorestframework==3.3.3
 # GIS
 djangorestframework-gis==0.10.1
 geopy==1.11.0
+
+# graphql
+graphene==0.8.0
+django-graphiql==0.4.4
+graphql-django-view==1.1.0
+
+django-filter==0.13.0

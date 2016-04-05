@@ -47,6 +47,7 @@ THIRD_PARTY_APPS = (
     'rest_framework',  # RESTful API things/framework
     'rest_framework_gis',  # GIS support for rest_framework
     'recurrence',  # helpers for handling recurring dates
+    'django_graphiql',  # visual graphql query tester
 )
 
 # Apps specific for this project go here.

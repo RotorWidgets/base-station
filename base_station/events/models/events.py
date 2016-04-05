@@ -18,7 +18,7 @@ from .templates import EventTemplate
 from .managers import EventModelManager
 from .meta import Location
 from .utils import OccurrenceReplacer
-from base_station.utils.models import UUIDModel
+from base_station.utils.models import SyncModel
 
 
 logger = logging.getLogger(__name__)
@@ -69,7 +69,7 @@ class EventModelMixin(TimeStampedModel, TitleSlugDescriptionModel):
 
 
 # TODO: occurrence name pattern generator from *_templates (eg. January Meeting)
-class Event(UUIDModel, EventModelMixin):
+class Event(SyncModel, EventModelMixin):
     """
     Hold the information about an event in the calendar.
 
