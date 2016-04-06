@@ -1,0 +1,9 @@
+#!/bin/sh
+# Run html coverage report
+
+set -e
+cd "$(dirname "$0")/.."
+
+coverage run manage.py test
+coverage html
+open htmlcov/index.html
