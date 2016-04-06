@@ -5,13 +5,13 @@ from graphene.contrib.django.filter import DjangoFilterConnectionField
 from graphene.core.types.custom_scalars import DateTime
 
 from .models import RaceHeat, HeatEvent
-from base_station.utils.interfaces import TimeStampedInterface
+from base_station.utils.interfaces import TimeStampedInterface, SyncModelInterface
 
 
 schema = graphene.Schema(name='Race details')
 
 
-class RaceHeatNode(TimeStampedInterface, DjangoNode):
+class RaceHeatNode(SyncModelInterface, TimeStampedInterface, DjangoNode):
 
     number = graphene.Int().NonNull
     # event = FK
@@ -31,7 +31,7 @@ class RaceHeatNode(TimeStampedInterface, DjangoNode):
         return RaceHeatNode(RaceHeat.objects.get(_id))
 
 
-class HeatEventNode(TimeStampedInterface, DjangoNode):
+class HeatEventNode(SyncModelInterface, TimeStampedInterface, DjangoNode):
 
     heat = relay.NodeField(RaceHeatNode)
 
