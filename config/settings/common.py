@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/dev/ref/settings/
 from __future__ import absolute_import, unicode_literals
 
 import environ
+import os
 
 ROOT_DIR = environ.Path(__file__) - 3  # (/a/b/myfile.py - 3 = /)
 APPS_DIR = ROOT_DIR.path('base_station')
@@ -48,6 +49,7 @@ THIRD_PARTY_APPS = (
     'rest_framework_gis',  # GIS support for rest_framework
     'recurrence',  # helpers for handling recurring dates
     'django_graphiql',  # visual graphql query tester
+    'webpack_loader',  # webpack interface and bundle template tags
 )
 
 # Apps specific for this project go here.
@@ -191,6 +193,7 @@ STATIC_URL = '/static/'
 # See: https://docs.djangoproject.com/en/dev/ref/contrib/staticfiles/#std:setting-STATICFILES_DIRS
 STATICFILES_DIRS = (
     str(APPS_DIR.path('static')),
+    str(ROOT_DIR.path('frontend/dist')),
 )
 
 # See: https://docs.djangoproject.com/en/dev/ref/contrib/staticfiles/#staticfiles-finders
@@ -253,3 +256,15 @@ CHANNEL_LAYERS = {
 # Serial interface settings
 SERIAL_INTERFACE = "/dev/master"
 SERIAL_BAUD = 115200
+
+# webpack configuration
+WEBPACK_LOADER = {
+    'DEFAULT': {
+        'CACHE': not DEBUG,
+        'BUNDLE_DIR_NAME': 'dist/', # must end with slash
+        'STATS_FILE': os.path.join(str(ROOT_DIR), 'frontend/webpack-stats.json'),
+        'POLL_INTERVAL': 0.1,
+        'IGNORE': ['.+\.hot-update.js', '.+\.map']
+    }
+}
+

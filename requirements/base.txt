@@ -76,3 +76,6 @@ django-graphiql==0.4.4
 graphql-django-view==1.1.0
 
 django-filter==0.13.0
+
+# Frontend build support
+django-webpack-loader==0.3.0

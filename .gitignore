@@ -46,12 +46,6 @@ htmlcov
 *.swp
 *.swo
 
-# npm
-node_modules/
-
-# Compass
-.sass-cache
-
 # virtual environments
 .env
 
@@ -64,11 +58,15 @@ tests/.hitch
 # MailHog binary
 mailhog
 
+# Frontend
+frontend/node_modules
+frontend/dist
+frontend/webpack-stats.json
+
 # Temporary ignores while things are sorted out:
 compose
 Dockerfile*
 install_*
-package.json
 requirements.apt
 runtime.txt
 .docker*
