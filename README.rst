@@ -1,6 +1,10 @@
 Base Station
 ==============================
 
+.. image:: https://requires.io/github/RotorWidgets/base-station/requirements.svg?branch=master
+     :target: https://requires.io/github/RotorWidgets/base-station/requirements/?branch=master
+     :alt: Requirements Status  
+
 Manage multi-rotor races and events with a high level of detail and ease.
 
 LICENSE: GNU v3
