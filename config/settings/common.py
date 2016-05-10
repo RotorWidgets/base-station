@@ -58,8 +58,10 @@ LOCAL_APPS = (
     'base_station.users',  # custom users app
     'base_station.trackers',  # interaction with tracker hardware
     'base_station.events',  # race customization and configuration
+    'base_station.pilots',  # pilot tracking and management
     'base_station.races',  # state data and handling of an ongoing/past race.
     'base_station.wireless',  # channels communication layer for wireless module
+    # not sure if REST API will continue to be supported in favor of graphql
     'base_station.api',  # RESTful api
 )
 

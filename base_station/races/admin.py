@@ -1,23 +1,45 @@
 from django.contrib import admin
 
-from base_station.races.models import RaceHeat, HeatEvent
+from base_station.races.models import Race, RaceGroup, RaceHeat, HeatEvent
+
+
+class RaceHeatInline(admin.StackedInline):
+    model = RaceHeat
+
+
+class RaceGroupInline(admin.StackedInline):
+    model = RaceGroup
+    fields = ('number',)
+    readonly_fields = ('number', )
+
+
+class RaceAdmin(admin.ModelAdmin):
+    model = Race
+    fields = ('name', 'event')
+    inlines = (
+        RaceHeatInline,
+        RaceGroupInline
+    )
 
 
 class RaceHeatAdmin(admin.ModelAdmin):
     model = RaceHeat
     fieldsets = (
         ('', {
-            'fields': ('created', 'modified')
+            'fields': ('number', 'created', 'active', 'modified')
         }),
-        ('Event Details', {
-            'fields': ('event',)
+        ('Timing', {
+            'fields': ('goal_start_time', 'goal_end_time', 'started_time', 'ended_time')
+        }),
+        ('Race Details', {
+            'fields': ('race',)
         })
     )
-    list_display = ('event', 'created')
-    search_fields = ('event',)
+    list_display = ('group_name', 'race', 'created')
+    search_fields = ('race',)
     date_heirachy = 'created'
-    # list_filter = ('event',)
-    readonly_fields = ('created', 'modified',)
+    list_filter = ('active',)
+    readonly_fields = ('number', 'created', 'modified',)
 
 
 class HeatEventAdmin(admin.ModelAdmin):
@@ -33,5 +55,6 @@ class HeatEventAdmin(admin.ModelAdmin):
     readonly_fields = ('created', 'modified',)
 
 
+admin.site.register(Race, RaceAdmin)
 admin.site.register(RaceHeat, RaceHeatAdmin)
 admin.site.register(HeatEvent, HeatEventAdmin)

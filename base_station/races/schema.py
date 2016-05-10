@@ -34,6 +34,8 @@ class HeatEvent(SyncModelInterface, TimeStampedInterface, DjangoNode):
 class RaceHeat(SyncModelInterface, TimeStampedInterface, DjangoNode):
 
     number = graphene.Int().NonNull
+    goal_start_time = DateTime()
+    goal_end_time = DateTime()
     started_time = DateTime()
     ended_time = DateTime()
     started = graphene.Boolean()

@@ -1,5 +1,4 @@
 import logging
-import json
 
 from catalog import Catalog
 from channels import Group
@@ -8,23 +7,58 @@ from django.utils.translation import ugettext_lazy as _
 from django_extensions.db.models import TimeStampedModel
 
 from base_station.events.models import Event
+from base_station.pilots.models import Pilot
 from base_station.trackers.models import Tracker
 from base_station.utils.models import SyncModel
 
 
 logger = logging.getLogger(__name__)
 
-# class Race(SyncModel, TimeStampedModel):
-#     """
-#     Container that is aware of what trackers are participating
-#     """
-#     pass
-#
 
-# class RaceGroup(SyncModel, TimeStampedModel):
-#     """
-#
-#     """
+class Race(SyncModel, TimeStampedModel):
+    """
+    Container that is aware of what pilots are participating and their relevant trackers
+    """
+
+    name = models.CharField(_('Race Name'), max_length=100)
+    event = models.ForeignKey(Event, related_name='races')
+
+    # TODO: scheduled times
+
+    class Meta:
+        unique_together = ("name", "event")
+
+    def __str__(self):
+        return "{}".format(self.name)
+
+
+class RaceGroup(SyncModel, TimeStampedModel):
+    """
+    If a race is split up into different groups we store pilot relationships to this group
+    """
+    number = models.PositiveSmallIntegerField(
+        _("Heat number"), blank=False, default=1)
+    race = models.ForeignKey(Race, related_name='groups')
+    pilots = models.ManyToManyField(Pilot, through='GroupPilot')
+
+    class Meta:
+        unique_together = ("number", "race")
+
+
+class GroupPilot(SyncModel):
+    pilot = models.ForeignKey(Pilot, on_delete=models.CASCADE)
+    group = models.ForeignKey(RaceGroup, on_delete=models.CASCADE)
+
+    # extra fields
+    tracker = models.ForeignKey(Tracker, blank=True, null=True)
+    added_on = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        # TODO: figure out a way to make pilots unique to the race.
+        # Maybe store all pilots on the race and then have code that makes sure
+        # There are no duplicates within race groups.
+        unique_together = ("pilot", "group")
+
 
 class RaceHeatQuerySet(models.QuerySet):
     # For use in the future when we need to filter race heats by some mechanism
@@ -33,14 +67,21 @@ class RaceHeatQuerySet(models.QuerySet):
 
 class RaceHeat(SyncModel, TimeStampedModel):
     """
-    A heat represents a singular race in which multiple racers are participating,
+    A heat represents a singular race in which multiple pilots are participating,
     A heat holds state that follows the designated race logic from the event.
-    Race heats are auto generated for a given race and log the different times they start and stop.
+    Race heats are auto generated for a given race from the settings
+    and log the different times they start and stop.
     """
 
     number = models.PositiveSmallIntegerField(
         _("Heat number"), blank=False, default=1)
-    event = models.ForeignKey(Event)
+    active = models.BooleanField(default=False)
+    race = models.ForeignKey(Race, related_name='heats')
+    group = models.ForeignKey(RaceGroup, blank=True, null=True)
+
+    # created when the
+    goal_start_time = models.DateTimeField(_("Heat goal start time"), blank=False)
+    goal_end_time = models.DateTimeField(_("Heat goal end time"), blank=False)
 
     started_time = models.DateTimeField(_("Heat started time"), blank=True, null=True)
     ended_time = models.DateTimeField(_("Heat ended time"), blank=True, null=True)
@@ -48,7 +89,7 @@ class RaceHeat(SyncModel, TimeStampedModel):
     objects = RaceHeatQuerySet.as_manager()
 
     class Meta:
-        unique_together = ("number", "event")
+        unique_together = ("number", "race")
 
     @property
     def started(self):
@@ -60,19 +101,18 @@ class RaceHeat(SyncModel, TimeStampedModel):
 
     @property
     def event_template(self):
-        return self.event.template
+        return self.race.event.template
 
     @property
     def group_name(self):
-        """Group name to use with channels"""
-        return "heat-{!s}".format(self.number)
+        """Group name for use with channels"""
+        return "{!s}-heat-{!s}".format(self.race.id, self.number)
 
     def get_channel_group(self):
-        # TODO: return the channel group for this RaceHeat
-        pass
+        return Group(self.group_name)
 
     def __str__(self):
-        return "{} heat".format(self.event)
+        return "{!s} heat {!s}".format(self.race, self.number)
 
 
 class HeatEventQuerySet(models.QuerySet):
@@ -109,7 +149,6 @@ class HeatEvent(SyncModel, TimeStampedModel):
     heat = models.ForeignKey(RaceHeat, related_name="triggered_events")
     # tracker that triggered the event if available
     tracker = models.ForeignKey(Tracker, related_name="triggered_events", blank=True, null=True)
-    # TODO: make a Category choice field?
     trigger = models.PositiveSmallIntegerField(
         _("trigger"), choices=TRIGGERS._zip("value", "label"))
 
