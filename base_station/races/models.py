@@ -35,6 +35,7 @@ class RaceHeat(SyncModel, TimeStampedModel):
     """
     A heat represents a singular race in which multiple racers are participating,
     A heat holds state that follows the designated race logic from the event.
+    Race heats are auto generated for a given race and log the different times they start and stop.
     """
 
     number = models.PositiveSmallIntegerField(
@@ -63,7 +64,12 @@ class RaceHeat(SyncModel, TimeStampedModel):
 
     @property
     def group_name(self):
+        """Group name to use with channels"""
         return "heat-{!s}".format(self.number)
+
+    def get_channel_group(self):
+        # TODO: return the channel group for this RaceHeat
+        pass
 
     def __str__(self):
         return "{} heat".format(self.event)

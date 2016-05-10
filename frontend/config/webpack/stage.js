@@ -2,7 +2,8 @@
 // Usuful to make test the production build and any errors that may come up.
 import webpack from 'webpack'
 import BundleTracker from 'webpack-bundle-tracker'
-import CleanWebpackPlugin from 'clean-webpack-plugin'
+// FIX: clean-webpack-plugin deletes directory which causes issues, find an alternative
+// import CleanWebpackPlugin from 'clean-webpack-plugin'
 
 import config from '../'
 import webpackConfig from './_base'
@@ -25,9 +26,9 @@ export default {
     new webpack.optimize.CommonsChunkPlugin(LIBS_BUNDLE, `${LIBS_BUNDLE}.[hash].js`),
     new BundleTracker({
       filename: './webpack-stats.json'
-    }),
-    new CleanWebpackPlugin(['dist'], {
-      root: config.get('path_project')
     })
+    // new CleanWebpackPlugin(['dist'], {
+    //   root: config.get('path_project')
+    // })
   ]
 }

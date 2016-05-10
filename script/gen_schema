@@ -1,0 +1,10 @@
+#!/bin/sh
+# Open a console session to the app
+
+# Exit imediately on any error
+set -e
+
+# Set root dir active
+cd "$(dirname "$0")/.."
+
+python manage.py graphql_schema --schema base_station.races.schema --out ./frontend/src/data/schema.json

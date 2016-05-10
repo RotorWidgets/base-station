@@ -62,6 +62,7 @@ mailhog
 frontend/node_modules
 frontend/dist
 frontend/webpack-stats.json
+frontend/src/data/schema.json
 
 # Temporary ignores while things are sorted out:
 compose

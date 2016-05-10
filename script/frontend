@@ -4,4 +4,7 @@
 set -e
 cd "$(dirname "$0")/../frontend/"
 
-NODE_ENV=development npm run "$@"
+# Always generate schema on any run command
+../script/gen_schema
+
+npm run "$@"

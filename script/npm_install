@@ -1,0 +1,7 @@
+#!/bin/sh
+# Install a frontend dependancy
+
+set -e
+cd "$(dirname "$0")/../frontend/"
+
+npm install $@

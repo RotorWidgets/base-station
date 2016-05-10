@@ -1,7 +1,0 @@
-#!/bin/sh
-# Open a console session to the app
-
-set -e
-cd "$(dirname "$0")/../frontend/"
-
-NODE_ENV=production npm run "$@"

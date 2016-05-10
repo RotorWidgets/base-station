@@ -4,12 +4,13 @@ import webpack from 'webpack'
 import config from '../'
 
 let path_project = config.get('path_project')
+let src_dir = path.join(config.get('path_project'), 'src')
 
 export default {
   target: 'web',
-  devtool: '#source-map',
+  devtool: 'source-map',
   entry: {
-    bundle: [path.join(config.get('dir_src'), 'index.jsx')]
+    bundle: [path.join(config.get('dir_src'), 'client.jsx')]
   },
   output: {
     path: path.join(config.get('dir_dist'), config.get('globals').__BASE__),
@@ -24,7 +25,11 @@ export default {
         test: /\.jsx?$/,
         loader: 'babel',
         exclude: ['node_modules'],
-        include: `${config.get('dir_src')}`
+        include: `${config.get('dir_src')}`,
+        query: {
+          // This can't be loaded through .babelrc for some reason.
+          plugins: [`${path_project}/plugins/babelRelayPlugin`]
+        }
       },
       {
         test: /\.json$/,
@@ -38,8 +43,10 @@ export default {
     modulesDirectories: ['web_modules', 'node_modules'],
     alias: {
       react: path.resolve(path.join(path_project, 'node_modules', 'react')),
-      components: path.resolve(path.join(config.get('path_project'), 'src', 'components')),
-      containers: path.resolve(path.join(config.get('path_project'), 'src', 'containers'))
+      components: path.resolve(path.join(src_dir, 'components')),
+      containers: path.resolve(path.join(src_dir, 'containers')),
+      mutations: path.resolve(path.join(src_dir, 'mutations')),
+      queries: path.resolve(path.join(src_dir, 'queries'))
     }
   },
   plugins: [

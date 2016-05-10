@@ -1,21 +1,18 @@
 import {render} from 'react-dom'
 import React from 'react'
-
 import { AppContainer } from 'react-hot-loader'
-import Root from 'containers/Root'
+import Router from './containers/Router'
 
 render(
-  <AppContainer
-    component={Root}
-  />,
+  <AppContainer component={Router}/>,
   document.getElementById('root')
 )
 
 if (module.hot) {
-  module.hot.accept('./containers/Root', () => {
+  module.hot.accept('./containers/Router', () => {
     render(
       <AppContainer
-        component={require('./containers/Root').default}
+        component={require('./containers/Router').default}
       />,
       document.getElementById('root')
     )

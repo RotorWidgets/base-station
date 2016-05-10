@@ -50,6 +50,7 @@ THIRD_PARTY_APPS = (
     'recurrence',  # helpers for handling recurring dates
     'django_graphiql',  # visual graphql query tester
     'webpack_loader',  # webpack interface and bundle template tags
+    'graphene.contrib.django', # graphql server/parser for python/django
 )
 
 # Apps specific for this project go here.
@@ -267,4 +268,3 @@ WEBPACK_LOADER = {
         'IGNORE': ['.+\.hot-update.js', '.+\.map']
     }
 }
-

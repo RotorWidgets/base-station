@@ -3,8 +3,11 @@ set -e
 cd "$(dirname "$0")/.."
 
 # sudo script/setup_system
-
+# Get all python requirements
 pip install -r requirements.txt
 
-cd "frontend"
-npm install
+# Generate schema.json files for relay on the frontend
+./script/gen_schema
+
+# Get all frontend/build requirements
+npm install --prefix ./frontend/
