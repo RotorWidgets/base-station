@@ -1,0 +1,11 @@
+#!/bin/sh
+# Open a console session to the app
+# TODO: test
+
+# Exit imediately on any error
+set -e
+
+# Set root dir active
+cd "$(dirname "$0")/.."
+
+./manage.py graph_transitions -o race_transitions.png races.RaceHeat

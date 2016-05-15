@@ -50,7 +50,10 @@ THIRD_PARTY_APPS = (
     'recurrence',  # helpers for handling recurring dates
     'django_graphiql',  # visual graphql query tester
     'webpack_loader',  # webpack interface and bundle template tags
-    'graphene.contrib.django', # graphql server/parser for python/django
+    'graphene.contrib.django',  # graphql server/parser for python/django
+    'django_fsm',  # Finite state machine
+    'fsm_admin',  # FSM admin support
+    # 'django_fsm_log',  # FSM logging
 )
 
 # Apps specific for this project go here.

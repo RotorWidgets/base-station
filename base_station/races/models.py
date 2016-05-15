@@ -1,3 +1,4 @@
+from datetime import datetime
 import logging
 
 from catalog import Catalog
@@ -5,6 +6,7 @@ from channels import Group
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from django_extensions.db.models import TimeStampedModel
+from django_fsm import FSMIntegerField, transition
 
 from base_station.events.models import Event
 from base_station.pilots.models import Pilot
@@ -22,6 +24,8 @@ class Race(SyncModel, TimeStampedModel):
 
     name = models.CharField(_('Race Name'), max_length=100)
     event = models.ForeignKey(Event, related_name='races')
+    # Relationship or property with state filter? probably relationship updated by state changes.
+    # current_heat = models.ForeignKey('RaceHeat', blank=True, null=True)
 
     # TODO: scheduled times
 
@@ -65,6 +69,14 @@ class RaceHeatQuerySet(models.QuerySet):
     pass
 
 
+class RaceHeatState(Catalog):
+    _attrs = 'value', 'label'
+    waiting = 0, 'Waiting'
+    running = 1, 'Running'
+    restarting = 2, 'Restarting'
+    ended = 3, 'Ended'
+
+
 class RaceHeat(SyncModel, TimeStampedModel):
     """
     A heat represents a singular race in which multiple pilots are participating,
@@ -75,9 +87,11 @@ class RaceHeat(SyncModel, TimeStampedModel):
 
     number = models.PositiveSmallIntegerField(
         _("Heat number"), blank=False, default=1)
-    active = models.BooleanField(default=False)
     race = models.ForeignKey(Race, related_name='heats')
     group = models.ForeignKey(RaceGroup, blank=True, null=True)
+    state = FSMIntegerField(
+        choices=RaceHeatState._zip("value", "label"),
+        default=RaceHeatState.waiting.value)
 
     # created when the
     goal_start_time = models.DateTimeField(_("Heat goal start time"), blank=False)
@@ -91,8 +105,44 @@ class RaceHeat(SyncModel, TimeStampedModel):
     class Meta:
         unique_together = ("number", "race")
 
+    def __str__(self):
+        return "{!s} heat {!s}".format(self.race, self.number)
+
+    @transition(
+        field=state,
+        source=[
+            RaceHeatState.waiting.value,
+            RaceHeatState.restarting.value,
+        ],
+        target=RaceHeatState.running.value)
+    def start(self):
+        # TODO: fails if there is already another heat running.
+        self.started_time = datetime.now()
+
+    @transition(
+        field=state,
+        source=RaceHeatState.running.value,
+        target=RaceHeatState.ended.value
+    )
+    def end(self):
+        self.ended_time = datetime.now()
+
+    @transition(
+        field=state,
+        source=[
+            RaceHeatState.running.value,
+            RaceHeatState.ended.value,
+        ],
+        target=RaceHeatState.restarting.value)
+    def restart(self):
+        """
+        Allow a finished or running race to be restarted.
+        """
+        self.started_time = None
+
     @property
     def started(self):
+        # TODO: may tie this into the state machine
         return bool(self.started_time)
 
     @property
@@ -110,9 +160,6 @@ class RaceHeat(SyncModel, TimeStampedModel):
 
     def get_channel_group(self):
         return Group(self.group_name)
-
-    def __str__(self):
-        return "{!s} heat {!s}".format(self.race, self.number)
 
 
 class HeatEventQuerySet(models.QuerySet):

@@ -27,7 +27,7 @@ class EventTemplate(SyncModel, TimeStampedModel):
     history = HistoricalRecords()
 
     def __str__(self):
-        return self.title
+        return self.name
 
 
 class Timer(SyncModel):

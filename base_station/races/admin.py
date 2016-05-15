@@ -1,4 +1,5 @@
 from django.contrib import admin
+from fsm_admin.mixins import FSMTransitionMixin
 
 from base_station.races.models import Race, RaceGroup, RaceHeat, HeatEvent
 
@@ -25,11 +26,11 @@ class RaceAdmin(admin.ModelAdmin):
     readonly_fields = ('created', 'modified',)
 
 
-class RaceHeatAdmin(admin.ModelAdmin):
+class RaceHeatAdmin(FSMTransitionMixin, admin.ModelAdmin):
     model = RaceHeat
     fieldsets = (
         ('', {
-            'fields': ('number', 'created', 'active', 'modified')
+            'fields': ('number', 'created', 'modified')
         }),
         ('Timing', {
             'fields': ('goal_start_time', 'goal_end_time', 'started_time', 'ended_time')
@@ -38,10 +39,11 @@ class RaceHeatAdmin(admin.ModelAdmin):
             'fields': ('race',)
         })
     )
-    list_display = ('group_name', 'race', 'created')
+    list_display = ('group_name', 'race', 'created', 'state')
     search_fields = ('race',)
     date_heirachy = 'created'
-    list_filter = ('active',)
+    list_filter = ('state',)
+    fsm_field = ['state',]
     readonly_fields = ('number', 'created', 'modified',)
     raw_id_fields = ('race',)
 

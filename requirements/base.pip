@@ -79,3 +79,8 @@ django-filter==0.13.0
 
 # Frontend build support
 django-webpack-loader==0.3.0
+
+# State machine
+django-fsm==2.4.0
+django-fsm-admin==1.2.3
+django-fsm-log==1.3.0
