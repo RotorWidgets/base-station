@@ -6,24 +6,27 @@ from base_station.races.models import Race, RaceGroup, RaceHeat, HeatEvent
 
 class RaceHeatInline(admin.StackedInline):
     model = RaceHeat
+    readonly_fields = ('number', 'state',)
+    raw_id_fields = ('race', 'group',)
     extra = 0
 
 
 class RaceGroupInline(admin.StackedInline):
     model = RaceGroup
     fields = ('number',)
-    readonly_fields = ('number', )
+    readonly_fields = ('number',)
     extra = 0
 
 
 class RaceAdmin(admin.ModelAdmin):
     model = Race
-    fields = ('name', 'event')
+    fields = ('name', 'event', 'current_heat')
     inlines = (
         RaceHeatInline,
         RaceGroupInline
     )
     readonly_fields = ('created', 'modified',)
+    raw_id_fields = ('event', 'current_heat',)
 
 
 class RaceHeatAdmin(FSMTransitionMixin, admin.ModelAdmin):
@@ -32,14 +35,14 @@ class RaceHeatAdmin(FSMTransitionMixin, admin.ModelAdmin):
         ('', {
             'fields': ('state', 'number', 'created', 'modified')
         }),
-        ('Timing', {
-            'fields': ('goal_start_time', 'goal_end_time', 'started_time', 'ended_time')
-        }),
         ('Race Details', {
             'fields': ('race',)
+        }),
+        ('Timing', {
+            'fields': ('goal_start_time', 'goal_end_time', 'started_time', 'ended_time')
         })
     )
-    list_display = ('group_name', 'race', 'created', 'state')
+    list_display = ('number', 'race', 'goal_start_time', 'state')
     search_fields = ('race',)
     date_heirachy = 'created'
     list_filter = ('state',)

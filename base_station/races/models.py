@@ -24,8 +24,7 @@ class Race(SyncModel, TimeStampedModel):
 
     name = models.CharField(_('Race Name'), max_length=100)
     event = models.ForeignKey(Event, related_name='races')
-    # Relationship or property with state filter? probably relationship updated by state changes.
-    # current_heat = models.ForeignKey('RaceHeat', blank=True, null=True)
+    current_heat = models.OneToOneField('RaceHeat', blank=True, null=True, related_name='current_of')
 
     # TODO: scheduled times
 
@@ -34,6 +33,8 @@ class Race(SyncModel, TimeStampedModel):
 
     def __str__(self):
         return "{}".format(self.name)
+
+    # TODO: mechanism for adding pilots and having them auto assigned to a group.
 
 
 class RaceGroup(SyncModel, TimeStampedModel):
@@ -60,7 +61,7 @@ class GroupPilot(SyncModel):
     class Meta:
         # TODO: figure out a way to make pilots unique to the race.
         # Maybe store all pilots on the race and then have code that makes sure
-        # There are no duplicates within race groups.
+        # There are no duplicates between race groups.
         unique_together = ("pilot", "group")
 
 
@@ -102,11 +103,27 @@ class RaceHeat(SyncModel, TimeStampedModel):
 
     objects = RaceHeatQuerySet.as_manager()
 
+    ACTIVE_STATES = (RaceHeatState.running.value, RaceHeatState.restarting.value)
+
     class Meta:
         unique_together = ("number", "race")
+        ordering = ('number',)
 
     def __str__(self):
         return "{!s} heat {!s}".format(self.race, self.number)
+
+    def save(self, *args, **kwargs):
+        if self._state.adding:
+            # When adding a new heat increment the number
+            max_query = self.race.heats.aggregate(models.Max('number'))
+            max_number = max_query['number__max'] or 0
+            self.number = max_number + 1
+        super().save(*args, **kwargs)
+
+    def start_condition(self):
+        """Checks that there are no active heats, excludes current heat"""
+        return not bool(
+            self.race.heats.filter(state__in=self.ACTIVE_STATES).exclude(pk=self.pk))
 
     @transition(
         field=state,
@@ -114,9 +131,12 @@ class RaceHeat(SyncModel, TimeStampedModel):
             RaceHeatState.waiting.value,
             RaceHeatState.restarting.value,
         ],
-        target=RaceHeatState.running.value)
+        target=RaceHeatState.running.value,
+        conditions=[start_condition])
     def start(self):
-        # TODO: fails if there is already another heat running.
+        """Allow a waiting or restarted race to be started"""
+        self.race.current_heat = self
+        self.race.save()
         self.started_time = datetime.now()
         self.ended_time = None
 
@@ -126,6 +146,7 @@ class RaceHeat(SyncModel, TimeStampedModel):
         target=RaceHeatState.ended.value
     )
     def end(self):
+        """Allow a running heat to be ended"""
         self.ended_time = datetime.now()
 
     @transition(
@@ -136,9 +157,9 @@ class RaceHeat(SyncModel, TimeStampedModel):
         ],
         target=RaceHeatState.restarting.value)
     def restart(self):
-        """
-        Allow a finished or running race to be restarted.
-        """
+        """Allow a finished or running race to be restarted."""
+        # Currently you can restart a heat with another in an active state,
+        # may need to restrict it to when nothing is active
         self.started_time = None
         self.ended_time = None
 
