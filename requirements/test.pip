@@ -1,5 +1,5 @@
 # Test dependencies go here.
--r base.txt
+-r base.pip
 
 coverage==4.0.3
 django_coverage_plugin==1.1
