@@ -5,12 +5,14 @@ from base_station.races.models import Race, RaceGroup, RaceHeat, HeatEvent
 
 class RaceHeatInline(admin.StackedInline):
     model = RaceHeat
+    extra = 0
 
 
 class RaceGroupInline(admin.StackedInline):
     model = RaceGroup
     fields = ('number',)
     readonly_fields = ('number', )
+    extra = 0
 
 
 class RaceAdmin(admin.ModelAdmin):
@@ -20,6 +22,7 @@ class RaceAdmin(admin.ModelAdmin):
         RaceHeatInline,
         RaceGroupInline
     )
+    readonly_fields = ('created', 'modified',)
 
 
 class RaceHeatAdmin(admin.ModelAdmin):
@@ -40,6 +43,7 @@ class RaceHeatAdmin(admin.ModelAdmin):
     date_heirachy = 'created'
     list_filter = ('active',)
     readonly_fields = ('number', 'created', 'modified',)
+    raw_id_fields = ('race',)
 
 
 class HeatEventAdmin(admin.ModelAdmin):
@@ -53,6 +57,7 @@ class HeatEventAdmin(admin.ModelAdmin):
     search_fields = ('heat',)
     list_filter = ('trigger',)
     readonly_fields = ('created', 'modified',)
+    raw_id_fields = ('heat', 'tracker')
 
 
 admin.site.register(Race, RaceAdmin)

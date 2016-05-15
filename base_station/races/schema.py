@@ -1,14 +1,35 @@
 import graphene
 from graphene import relay, resolve_only_args
 from graphene.contrib.django import DjangoNode, DjangoObjectType
+from graphene.contrib.django.debug import DjangoDebugPlugin
 from graphene.contrib.django.filter import DjangoFilterConnectionField
 from graphene.core.types.custom_scalars import DateTime
 
 from . import models
+from base_station.pilots.schema import Pilot
 from base_station.utils.interfaces import TimeStampedInterface, SyncModelInterface
 
 
-schema = graphene.Schema(name='Race details')
+class RaceGroup(SyncModelInterface, TimeStampedInterface, DjangoNode):
+
+    class Meta:
+        model = models.RaceGroup
+
+
+class Race(SyncModelInterface, TimeStampedInterface, DjangoNode):
+
+    groups = DjangoFilterConnectionField(RaceGroup, description='All Pilot Groups')
+
+    class Meta:
+        model = models.Race
+
+
+class GroupPilot(SyncModelInterface, TimeStampedInterface, DjangoNode):
+
+    pilot = relay.NodeField(Pilot)
+
+    class Meta:
+        model = models.GroupPilot
 
 
 class HeatEvent(SyncModelInterface, TimeStampedInterface, DjangoNode):
@@ -38,6 +59,7 @@ class RaceHeat(SyncModelInterface, TimeStampedInterface, DjangoNode):
     goal_end_time = DateTime()
     started_time = DateTime()
     ended_time = DateTime()
+    active = graphene.Boolean()
     started = graphene.Boolean()
     ended = graphene.Boolean()
     event_template = graphene.String()
@@ -54,6 +76,9 @@ class RaceHeat(SyncModelInterface, TimeStampedInterface, DjangoNode):
 
 
 class RaceQuery(graphene.ObjectType):
+    race = relay.NodeField(Race)
+    all_races = DjangoFilterConnectionField(Race, description='All Races')
+
     heat = relay.NodeField(RaceHeat)
     all_heats = DjangoFilterConnectionField(RaceHeat, description='All Race Heats')
 
@@ -77,4 +102,9 @@ class RaceQuery(graphene.ObjectType):
         return models.RaceHeat.objects.filter(ended_time__isnull=True).count()
 
 
-schema.query = RaceQuery
+schema = graphene.Schema(
+    query=RaceQuery,
+    name='Race details',
+    # Currently causing issues
+    # plugins=[DjangoDebugPlugin()]
+)
