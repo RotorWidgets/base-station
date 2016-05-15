@@ -118,6 +118,7 @@ class RaceHeat(SyncModel, TimeStampedModel):
     def start(self):
         # TODO: fails if there is already another heat running.
         self.started_time = datetime.now()
+        self.ended_time = None
 
     @transition(
         field=state,
@@ -139,6 +140,7 @@ class RaceHeat(SyncModel, TimeStampedModel):
         Allow a finished or running race to be restarted.
         """
         self.started_time = None
+        self.ended_time = None
 
     @property
     def started(self):
