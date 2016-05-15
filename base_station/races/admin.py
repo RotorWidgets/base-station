@@ -30,7 +30,7 @@ class RaceHeatAdmin(FSMTransitionMixin, admin.ModelAdmin):
     model = RaceHeat
     fieldsets = (
         ('', {
-            'fields': ('number', 'created', 'modified')
+            'fields': ('state', 'number', 'created', 'modified')
         }),
         ('Timing', {
             'fields': ('goal_start_time', 'goal_end_time', 'started_time', 'ended_time')
@@ -44,7 +44,7 @@ class RaceHeatAdmin(FSMTransitionMixin, admin.ModelAdmin):
     date_heirachy = 'created'
     list_filter = ('state',)
     fsm_field = ['state',]
-    readonly_fields = ('number', 'created', 'modified',)
+    readonly_fields = ('state', 'number', 'created', 'modified',)
     raw_id_fields = ('race',)
 
 
