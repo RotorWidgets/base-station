@@ -5,6 +5,18 @@ Base Station
      :target: https://requires.io/github/RotorWidgets/base-station/requirements/?branch=master
      :alt: Requirements Status  
 
+.. image:: https://codeclimate.com/github/RotorWidgets/base-station/badges/gpa.svg
+   :target: https://codeclimate.com/github/RotorWidgets/base-station
+   :alt: Code Climate
+
+.. image:: https://codeclimate.com/github/RotorWidgets/base-station/badges/coverage.svg
+   :target: https://codeclimate.com/github/RotorWidgets/base-station/coverage
+   :alt: Test Coverage
+
+.. image:: https://codeclimate.com/github/RotorWidgets/base-station/badges/issue_count.svg
+   :target: https://codeclimate.com/github/RotorWidgets/base-station
+   :alt: Issue Count
+
 Manage multi-rotor races and events with a high level of detail and ease.
 
 LICENSE: GNU v3
