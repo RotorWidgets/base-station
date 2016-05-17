@@ -23,14 +23,6 @@ class RoundQuerySet(models.QuerySet):
         return RacePilot.objects.filter(race=self.race, heat_number=self.heat_number)
 
 
-class RoundState(Catalog):
-    _attrs = 'value', 'label'
-    waiting = 0, 'Waiting'
-    running = 1, 'Running'
-    restarting = 2, 'Restarting'
-    ended = 3, 'Ended'
-
-
 class Round(SyncModel, TimeStampedModel):
     # TODO-FIX: I may be confusing rounds and rounds. Where rounds are incremented, and rounds are the groups.
     """
@@ -43,9 +35,6 @@ class Round(SyncModel, TimeStampedModel):
     number = models.PositiveSmallIntegerField(_("Round"), blank=False, default=1)
     race = models.ForeignKey(Race, related_name='rounds')
     heat_number = models.PositiveSmallIntegerField(_("Heat"), blank=False, default=1)
-    state = FSMIntegerField(
-        choices=RoundState._zip("value", "label"),
-        default=RoundState.waiting.value)
 
     # created when the
     goal_start_time = models.DateTimeField(_("Round goal start time"), blank=False)
@@ -56,7 +45,18 @@ class Round(SyncModel, TimeStampedModel):
 
     objects = RoundQuerySet.as_manager()
 
-    ACTIVE_STATES = (RoundState.running.value, RoundState.restarting.value)
+    class STATES(Catalog):
+        _attrs = 'value', 'label'
+        waiting = 0, 'Waiting'
+        running = 1, 'Running'
+        restarting = 2, 'Restarting'
+        ended = 3, 'Ended'
+
+    state = FSMIntegerField(
+        choices=STATES._zip("value", "label"),
+        default=STATES.waiting.value)
+
+    ACTIVE_STATES = (STATES.running.value, STATES.restarting.value)
 
     class Meta:
         unique_together = (
@@ -87,10 +87,10 @@ class Round(SyncModel, TimeStampedModel):
     @transition(
         field=state,
         source=[
-            RoundState.waiting.value,
-            RoundState.restarting.value,
+            STATES.waiting.value,
+            STATES.restarting.value,
         ],
-        target=RoundState.running.value,
+        target=STATES.running.value,
         conditions=[start_condition])
     def start(self):
         """Allow a waiting or restarted round to be started"""
@@ -101,8 +101,8 @@ class Round(SyncModel, TimeStampedModel):
 
     @transition(
         field=state,
-        source=RoundState.running.value,
-        target=RoundState.ended.value)
+        source=STATES.running.value,
+        target=STATES.ended.value)
     def end(self):
         """Allow a running round to be ended"""
         self.ended_time = datetime.now()
@@ -110,10 +110,10 @@ class Round(SyncModel, TimeStampedModel):
     @transition(
         field=state,
         source=[
-            RoundState.running.value,
-            RoundState.ended.value,
+            STATES.running.value,
+            STATES.ended.value,
         ],
-        target=RoundState.restarting.value)
+        target=STATES.restarting.value)
     def restart(self):
         """Allow a finished or running race round to be restarted."""
         # Currently you can restart a round with another in an active state,
@@ -122,12 +122,12 @@ class Round(SyncModel, TimeStampedModel):
         self.ended_time = None
 
     @property
-    def started(self):
+    def has_started(self):
         # TODO: may tie this into the state machine
         return bool(self.started_time)
 
     @property
-    def ended(self):
+    def has_ended(self):
         return bool(self.ended_time)
 
     @property
