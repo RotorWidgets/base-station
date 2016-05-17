@@ -6,11 +6,13 @@ from graphene.contrib.django.filter import DjangoFilterConnectionField
 from graphene.core.types.custom_scalars import DateTime
 
 from . import models
-from base_station.pilots.schema import Pilot
+from base_station.pilots import schema as pilot_schema
 from base_station.utils.graphene.interfaces import TimeStampedInterface, SyncModelInterface
 
 
 class RacePilot(SyncModelInterface, TimeStampedInterface, DjangoNode):
+
+    pilot = relay.NodeField(pilot_schema.Pilot)
 
     class Meta:
         model = models.RacePilot
@@ -18,10 +20,21 @@ class RacePilot(SyncModelInterface, TimeStampedInterface, DjangoNode):
 
 class Race(SyncModelInterface, TimeStampedInterface, DjangoNode):
 
-    heats = DjangoFilterConnectionField(RacePilot, description='All Pilot Heats')
+    pilots = DjangoFilterConnectionField(pilot_schema.Pilot, description='All Pilots')
+    # TODO: figure out how to work with m2m through models.
+    # https://github.com/graphql-python/graphene/issues/83
+    # pilots = DjangoFilterConnectionField(RacePilot, description='All Pilots')
+    round_count = graphene.Int()
+    rounds_remaining = graphene.Int()
 
     class Meta:
         model = models.Race
+
+    def resolve_round_count(self, data, info, *args, **kwargs):
+        return self.instance.rounds.count()
+
+    def resolve_rounds_remaining(self, data, info):
+        return self.instance.rounds.filter(ended_time__isnull=True).count()
 
 
 class RoundEvent(SyncModelInterface, TimeStampedInterface, DjangoNode):
@@ -34,7 +47,8 @@ class RoundEvent(SyncModelInterface, TimeStampedInterface, DjangoNode):
         model = models.RoundEvent
 
         filter_fields = {
-            'trigger': ('exact',)
+            'trigger': ('exact',),
+            'tracker': ('exact',)
         }
 
     def resolve_trigger_label(self, data, info):
@@ -51,20 +65,19 @@ class Round(SyncModelInterface, TimeStampedInterface, DjangoNode):
     goal_end_time = DateTime()
     started_time = DateTime()
     ended_time = DateTime()
-    active = graphene.Boolean()
-    started = graphene.Boolean()
-    ended = graphene.Boolean()
+    has_started = graphene.Boolean()
+    has_ended = graphene.Boolean()
     event_template = graphene.String()
+    state = graphene.Int()
+    state_label = graphene.String()
 
     events = DjangoFilterConnectionField(RoundEvent, description='Round Race Events')
 
     class Meta:
         model = models.Round
 
-    # May not be needed?
-    @classmethod
-    def get_node(cls, _id, info):
-        return Round(models.Round.objects.get(_id))
+    def resolve_state_label(self, data, info):
+        return self.instance.STATES(self.state).label
 
 
 class RaceQuery(graphene.ObjectType):
@@ -80,18 +93,10 @@ class RaceQuery(graphene.ObjectType):
     node = relay.NodeField()
     viewer = graphene.Field('self')
 
-    num_rounds = graphene.Int()
-
     def resolve_viewer(self, *args, **kwargs):
         # Currently we aren't filtering to only viewer specific data,
         # this is a stub to do that in the future.
         return self
-
-    def resolve_num_rounds(self, *args, **kwargs):
-        return models.Round.objects.all().count()
-
-    def resolve_num_rounds(self, *args, **kwargs):
-        return models.Round.objects.filter(ended_time__isnull=True).count()
 
 
 schema = graphene.Schema(
