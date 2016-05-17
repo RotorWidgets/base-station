@@ -4,29 +4,29 @@ import React from 'react'
 import { IndexRoute, Route } from 'react-router'
 
 import ViewerQueries from './queries/ViewerQueries'
-// import HeatQueries from './queries/HeatQueries'
+// import RoundQueries from './queries/RoundQueries'
 
-import HeatApp from './containers/HeatApp'
-import HeatList from './components/HeatList'
+import RoundApp from './containers/RoundApp'
+import RoundList from './components/RoundList'
 
-// path='/heats'
+// path='/rounds'
 // prepareParams={() => ({race: 'race_id'})}
-// TODO: add a route to filter heats by a particular race
+// TODO: add a route to filter rounds by a particular race
 // let IndexQuery = Relay.QL`query { viewer }`
 
 export default (
   <Route
     path='/'
-    component={HeatApp}
+    component={RoundApp}
     queries={ViewerQueries}
   >
     <IndexRoute
-      component={HeatList}
+      component={RoundList}
       queries={ViewerQueries}
     />
     <Route
-      path=':heatId'
-      component={HeatList}
+      path=':roundId'
+      component={RoundList}
       queries={ViewerQueries}
     />
   </Route>

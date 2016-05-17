@@ -2,7 +2,7 @@ from graphene import relay
 from graphene.contrib.django import DjangoNode
 
 from . import models
-from base_station.utils.interfaces import SyncModelInterface
+from base_station.utils.graphene.interfaces import SyncModelInterface
 
 
 class User(SyncModelInterface, DjangoNode):

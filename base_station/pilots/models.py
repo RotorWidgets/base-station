@@ -13,4 +13,6 @@ class Pilot(SyncModel):
     user = models.ForeignKey(User, blank=True, null=True)
 
     def __str__(self):
-        return "{}".format(self.moniker or self.user)
+        if self.user:
+            return "{} ({})".format(self.callsign, (self.user.name or self.user))
+        return "{}".format(self.callsign)

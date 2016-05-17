@@ -253,6 +253,10 @@ ADMIN_URL = r'^admin/'
 # Your common stuff: Below this line define 3rd party library settings
 
 CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "asgiref.inmemory.ChannelLayer",
+        "ROUTING": "base_station.wireless.routing.channel_routing",
+    },
     "wireless": {
         "BACKEND": "asgiref.inmemory.ChannelLayer",
         "ROUTING": "base_station.wireless.routing.channel_routing",

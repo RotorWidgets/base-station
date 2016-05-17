@@ -25,7 +25,7 @@ class EventItem extends Component {
 export default Relay.createContainer(EventItem, {
   fragments: {
     event: () => Relay.Ql`
-      fragment on HeatEventNode {
+      fragment on RoundEventNode {
         uuid
         trigger_label
       }

@@ -1,36 +1,43 @@
 from django.contrib import admin
 from fsm_admin.mixins import FSMTransitionMixin
 
-from base_station.races.models import Race, RaceGroup, RaceHeat, HeatEvent
+from base_station.races.models import (
+    Race,
+    RacePilot,
+    Round,
+    RoundEvent,
+    RaceOptions,
+    RaceType,
+    RaceTemplate
+)
 
-
-class RaceHeatInline(admin.StackedInline):
-    model = RaceHeat
-    readonly_fields = ('number', 'state',)
-    raw_id_fields = ('race', 'group',)
+class RoundInline(admin.StackedInline):
+    model = Round
+    readonly_fields = ('number', 'state', 'heat_number',)
+    raw_id_fields = ('race',)
     extra = 0
 
 
-class RaceGroupInline(admin.StackedInline):
-    model = RaceGroup
-    fields = ('number',)
-    readonly_fields = ('number',)
+class RacePilotInline(admin.StackedInline):
+    model = RacePilot
+    fields = ('heat_number', 'pilot', 'tracker',)
+    readonly_fields = ('heat_number',)
     extra = 0
 
 
 class RaceAdmin(admin.ModelAdmin):
     model = Race
-    fields = ('name', 'event', 'current_heat')
+    fields = ('name', 'event', 'current_round')
     inlines = (
-        RaceHeatInline,
-        RaceGroupInline
+        RoundInline,
+        RacePilotInline
     )
     readonly_fields = ('created', 'modified',)
-    raw_id_fields = ('event', 'current_heat',)
+    raw_id_fields = ('event', 'current_round',)
 
 
-class RaceHeatAdmin(FSMTransitionMixin, admin.ModelAdmin):
-    model = RaceHeat
+class RoundAdmin(FSMTransitionMixin, admin.ModelAdmin):
+    model = Round
     fieldsets = (
         ('', {
             'fields': ('state', 'number', 'created', 'modified')
@@ -42,7 +49,7 @@ class RaceHeatAdmin(FSMTransitionMixin, admin.ModelAdmin):
             'fields': ('goal_start_time', 'goal_end_time', 'started_time', 'ended_time')
         })
     )
-    list_display = ('number', 'race', 'goal_start_time', 'state')
+    list_display = ('number', 'heat_number', 'race', 'goal_start_time', 'state')
     search_fields = ('race',)
     date_heirachy = 'created'
     list_filter = ('state',)
@@ -51,20 +58,23 @@ class RaceHeatAdmin(FSMTransitionMixin, admin.ModelAdmin):
     raw_id_fields = ('race',)
 
 
-class HeatEventAdmin(admin.ModelAdmin):
-    model = HeatEvent
+class RoundEventAdmin(admin.ModelAdmin):
+    model = RoundEvent
     fieldsets = (
         ('', {
-            'fields': ('heat', 'tracker', 'trigger', 'created', 'modified')
+            'fields': ('round', 'tracker', 'trigger', 'created', 'modified')
         }),
     )
-    list_display = ('heat', 'tracker', 'trigger')
-    search_fields = ('heat',)
+    list_display = ('round', 'tracker', 'trigger')
+    search_fields = ('round',)
     list_filter = ('trigger',)
     readonly_fields = ('created', 'modified',)
-    raw_id_fields = ('heat', 'tracker')
+    raw_id_fields = ('round', 'tracker')
 
 
+admin.site.register(RaceOptions)
+admin.site.register(RaceType)
+admin.site.register(RaceTemplate)
 admin.site.register(Race, RaceAdmin)
-admin.site.register(RaceHeat, RaceHeatAdmin)
-admin.site.register(HeatEvent, HeatEventAdmin)
+admin.site.register(Round, RoundAdmin)
+admin.site.register(RoundEvent, RoundEventAdmin)

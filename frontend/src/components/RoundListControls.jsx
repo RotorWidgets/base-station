@@ -2,16 +2,16 @@ import React {Component} from 'react'
 import Relay from 'react-relay'
 import { IndexLink, Link } from 'react-router'
 
-// HeatListControls lets you show only upcoming heats
+// RoundListControls lets you show only upcoming rounds
 
-class HeatListControls extends Component {
+class RoundListControls extends Component {
   static propTypes = {
     viewer: React.PropTypes.object.isRequired
   }
 
   render() {
     return (
-      <header className="heat-list-controls">
+      <header className="round-list-controls">
         {this.render}
         <ui className="filters">
           <li>
@@ -26,20 +26,20 @@ class HeatListControls extends Component {
   }
 }
 
-export default Relay.createContainer(HeatListControls, {
+export default Relay.createContainer(RoundListControls, {
   // prepareVariables() {
   //   return {
   //     limit: -1 >>> 1
   //   }
   // },
-  // heats(status: "completed", first: $limit) {
+  // rounds(status: "completed", first: $limit) {
   //   ${RemoveCompletedTodosMutation.getFragment('todos')}
   // },
   fragments: {
     viewer: () => Relay.QL`
       fragment on RaceQuery {
-        numHeats,
-        numUpcomingHeats,
+        numRounds,
+        numUpcomingRounds,
         ${RemoveCompletedTodosMutation.getFragment('viewer')}
       }
     `

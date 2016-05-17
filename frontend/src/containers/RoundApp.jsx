@@ -1,7 +1,7 @@
 import React, { PropTypes } from 'react'
 import Relay from 'react-relay'
 
-class HeatApp extends React.Component {
+class RoundApp extends React.Component {
   static PropTypes = {
     viewer: PropTypes.object,
     children: PropTypes.node.isRequired
@@ -10,9 +10,9 @@ class HeatApp extends React.Component {
   render () {
     const { viewer, children } = this.props
     return (
-      <section className="heat-app">
+      <section className="round-app">
         <header>
-          <h3>All Heats</h3>
+          <h3>All Rounds</h3>
         </header>
         {children}
       </section>
@@ -20,12 +20,12 @@ class HeatApp extends React.Component {
   }
 }
 
-// $(HeatListHeader.getFragment('viewer'))
-export default Relay.createContainer(HeatApp, {
+// $(RoundListHeader.getFragment('viewer'))
+export default Relay.createContainer(RoundApp, {
   fragments: {
     viewer: () => Relay.QL`
       fragment on RaceQuery {
-        numHeats
+        numRounds
       }
     `
   }

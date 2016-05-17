@@ -17,6 +17,7 @@ class EventTemplate(SyncModel, TimeStampedModel):
     """
     Dictates the logic that is used when running a race.
     TODO: these become race rules, events are containers for races. Races contain specific rule sets for their operation.
+    # TODO: delete
     """
 
     name = models.CharField(_("name"), max_length=255, default="")

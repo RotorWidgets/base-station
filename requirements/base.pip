@@ -49,7 +49,7 @@ redis>=2.10.0
 django-extensions==1.6.1
 
 # Your custom requirements go here
-channels==0.8
+channels==0.13.1
 
 #pyserial==3.0.1
 

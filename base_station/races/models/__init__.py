@@ -1,3 +1,3 @@
-from .groups import RaceGroup, GroupPilot  # noqa
-from .races import Race  # noqa
-from .heats import RaceHeat, HeatEvent  # noqa
+from .races import Race, RacePilot  # noqa
+from .templates import RaceOptions, RaceType, RaceTemplate, Timer  # noqa
+from .rounds import Round, RoundEvent  # noqa

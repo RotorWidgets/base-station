@@ -3,7 +3,7 @@ from graphene.contrib.django import DjangoNode
 
 from . import models
 from base_station.users.schema import User
-from base_station.utils.interfaces import SyncModelInterface
+from base_station.utils.graphene.interfaces import SyncModelInterface
 
 
 class Pilot(SyncModelInterface, DjangoNode):
