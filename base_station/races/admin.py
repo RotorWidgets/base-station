@@ -65,7 +65,7 @@ class RoundEventAdmin(admin.ModelAdmin):
             'fields': ('round', 'tracker', 'trigger', 'created', 'modified')
         }),
     )
-    list_display = ('round', 'tracker', 'trigger')
+    list_display = ('round', 'tracker', 'trigger', 'created')
     search_fields = ('round',)
     list_filter = ('trigger',)
     readonly_fields = ('created', 'modified',)
